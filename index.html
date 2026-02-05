@@ -45,47 +45,288 @@
   /* petal element */
   .petal{position:absolute;width:36px;height:44px;transform-origin:center;will-change:transform,opacity;pointer-events:none}
   main{position:relative;z-index:1}
-</style>
-<style>
-/* 🎮 Catch-the-Heart Game (overlay only) */
-#heartGame{
-  position:absolute;
-  inset:0;
-  z-index:15;          /* below text, above animations */
-  pointer-events:auto;
-}
 
-#heartHUD{
-  position:absolute;
-  top:16px;
-  left:50%;
-  transform:translateX(-50%);
-  font-family:'Pacifico',cursive;
-  color:#ffd6e8;
-  font-size:22px;
-  text-shadow:0 4px 14px rgba(255,90,150,.35);
-}
-
-.catch-heart{
-  position:absolute;
-  font-size:34px;
-  cursor:pointer;
-  animation:floatUp 4s ease forwards;
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
-}
-
-@keyframes floatUp{
-  0%{opacity:0;transform:translateY(40px) scale(.9)}
-  20%{opacity:1}
-  100%{opacity:0;transform:translateY(-160px) scale(1.1)}
-}
-
-.score-pop{
-  animation:scorePop .35s ease;
-}
-@keyframes scorePop{
-  50%{transform:scale(1.4)}
-}
+  /* ============ GAME STYLES ============ */
+  #gameScreen {
+    background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+    z-index: 15;
+  }
+  
+  .game-header {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 0 20px;
+    z-index: 100;
+  }
+  
+  .game-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(24px, 5vw, 42px);
+    color: #ff6b9a;
+    text-shadow: 0 0 20px rgba(255, 107, 154, 0.6);
+    animation: titlePulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes titlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  
+  .score-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 12px 24px;
+    border: 2px solid rgba(255, 105, 180, 0.3);
+  }
+  
+  .score-text {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(18px, 4vw, 28px);
+    color: #ffd6e8;
+  }
+  
+  .score-value {
+    color: #ff6b9a;
+    font-weight: bold;
+    transition: transform 0.3s, color 0.3s;
+    display: inline-block;
+  }
+  
+  .score-pop {
+    animation: scorePop 0.4s ease-out;
+  }
+  
+  @keyframes scorePop {
+    0% { transform: scale(1); color: #ff6b9a; }
+    50% { transform: scale(1.8); color: #ffeb3b; }
+    100% { transform: scale(1); color: #ff6b9a; }
+  }
+  
+  .difficulty-selector {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 101;
+  }
+  
+  .difficulty-title {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(28px, 6vw, 48px);
+    color: #ff6b9a;
+    margin-bottom: 30px;
+    text-shadow: 0 0 30px rgba(255, 107, 154, 0.8);
+  }
+  
+  .difficulty-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .diff-btn {
+    padding: 16px 50px;
+    border-radius: 30px;
+    border: none;
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(18px, 4vw, 24px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .diff-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  
+  .diff-btn:hover::before {
+    transform: translateX(100%);
+  }
+  
+  .diff-easy {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: white;
+    box-shadow: 0 8px 25px rgba(74, 222, 128, 0.4);
+  }
+  
+  .diff-medium {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+  }
+  
+  .diff-hard {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+    color: white;
+    box-shadow: 0 8px 25px rgba(248, 113, 113, 0.4);
+  }
+  
+  .diff-btn:hover {
+    transform: scale(1.08) translateY(-3px);
+  }
+  
+  .game-heart {
+    position: absolute;
+    font-size: 50px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 50;
+    transition: transform 0.1s;
+    filter: drop-shadow(0 0 15px rgba(255, 105, 180, 0.7));
+    animation: heartBounce 0.8s ease-in-out infinite;
+  }
+  
+  @keyframes heartBounce {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(-5deg); }
+    75% { transform: scale(1.1) rotate(5deg); }
+  }
+  
+  .game-heart:hover {
+    transform: scale(1.3);
+  }
+  
+  .game-heart:active {
+    transform: scale(0.9);
+  }
+  
+  .heart-trail {
+    position: fixed;
+    pointer-events: none;
+    font-size: 20px;
+    z-index: 60;
+    animation: trailFade 0.6s ease-out forwards;
+  }
+  
+  @keyframes trailFade {
+    0% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0; transform: scale(0.3) translateY(-40px); }
+  }
+  
+  .catch-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 70;
+    animation: burstExpand 0.5s ease-out forwards;
+  }
+  
+  @keyframes burstExpand {
+    0% { opacity: 1; transform: scale(0.5); }
+    100% { opacity: 0; transform: scale(2.5); }
+  }
+  
+  .score-float {
+    position: fixed;
+    pointer-events: none;
+    font-family: 'Pacifico', cursive;
+    font-size: 32px;
+    color: #ffeb3b;
+    text-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
+    z-index: 80;
+    animation: floatUp 1s ease-out forwards;
+  }
+  
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+  }
+  
+  .game-complete-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  
+  .trophy {
+    font-size: 100px;
+    animation: trophyBounce 0.8s ease-out;
+  }
+  
+  @keyframes trophyBounce {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  
+  .complete-text {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(28px, 6vw, 48px);
+    color: #ff6b9a;
+    margin-top: 20px;
+    text-shadow: 0 0 30px rgba(255, 107, 154, 0.8);
+    animation: textGlow 1s ease-in-out infinite alternate;
+  }
+  
+  @keyframes textGlow {
+    0% { text-shadow: 0 0 20px rgba(255, 107, 154, 0.5); }
+    100% { text-shadow: 0 0 40px rgba(255, 107, 154, 1), 0 0 60px rgba(255, 107, 154, 0.5); }
+  }
+  
+  .final-score {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(20px, 4vw, 32px);
+    color: #ffd6e8;
+    margin-top: 15px;
+  }
+  
+  .timer-bar {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 400px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 100;
+  }
+  
+  .timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b9a, #ff3d81);
+    border-radius: 10px;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 15px rgba(255, 107, 154, 0.6);
+  }
+  
+  .game-instruction {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(14px, 3vw, 20px);
+    color: rgba(255, 214, 232, 0.8);
+    z-index: 100;
+  }
 </style>
 </head>
 <body>
@@ -103,16 +344,38 @@
   </div>
 </div>
 
+<!-- GAME SCREEN (NEW) -->
+<div id="gameScreen" class="screen hidden" role="region" aria-label="game-screen">
+  <div class="game-header">
+    <div class="game-title">💖 Catch the Hearts! 💖</div>
+    <div class="score-container">
+      <span class="score-text">Love Collected: <span class="score-value" id="scoreValue">0</span> / <span id="targetScore">5</span></span>
+    </div>
+  </div>
+  
+  <div class="difficulty-selector" id="difficultySelector">
+    <div class="difficulty-title">Choose Your Love Level 💕</div>
+    <div class="difficulty-buttons">
+      <button class="diff-btn diff-easy" onclick="startGame('easy')">💚 Easy (Slow Love)</button>
+      <button class="diff-btn diff-medium" onclick="startGame('medium')">💛 Medium (Sweet Love)</button>
+      <button class="diff-btn diff-hard" onclick="startGame('hard')">❤️ Hard (Crazy Love)</button>
+    </div>
+  </div>
+  
+  <div id="gameArea"></div>
+  
+  <div class="timer-bar" id="timerBar" style="display: none;">
+    <div class="timer-fill" id="timerFill"></div>
+  </div>
+  <div class="game-instruction" id="gameInstruction" style="display: none;">Tap the hearts before they escape! 💕</div>
+</div>
+
 <!-- RESULT (contains animation canvases & petal layer so they are visible when shown) -->
 <div id="result" class="screen hidden" aria-hidden="true" role="region" aria-label="result-screen">
   <!-- animation layers (inside result) -->
   <canvas id="fireworks" class="anim-canvas" aria-hidden="true"></canvas>
   <canvas id="confetti" class="anim-canvas" aria-hidden="true"></canvas>
   <div id="petals" aria-hidden="true"></div>
-  <!-- 🎮 Catch Game Overlay -->
-  <div id="heartGame">
-    <div id="heartHUD">💖 Love: <span id="heartScore">0</span>/5</div>
-  </div>
 
   <!-- content layer (above animation layers) -->
   <div class="result-layer">
@@ -186,41 +449,6 @@ function startTinyHearts(){
 }
 startTinyHearts();
 
-/* 🎮 Catch-the-Heart Game (isolated, safe) */
-function startCatchGame(){
-  const wrap = document.getElementById("heartGame");
-  if(!wrap) return; // safety check
-  const scoreEl = document.getElementById("heartScore");
-  let score = 0;
-  const TARGET = 5;
-
-  const spawn = setInterval(()=>{
-    if(score >= TARGET){
-      clearInterval(spawn);
-      wrap.remove();
-      return;
-    }
-
-    const h = document.createElement("div");
-    h.className = "catch-heart";
-    h.textContent = ["💖","💕","💗","💘"][Math.floor(Math.random()*4)];
-    h.style.left = (10 + Math.random()*80) + "vw";
-    h.style.top  = (55 + Math.random()*25) + "vh";
-
-    h.onclick = ()=>{
-      if(navigator.vibrate) navigator.vibrate(30);
-      score++;
-      scoreEl.textContent = score;
-      scoreEl.classList.add("score-pop");
-      setTimeout(()=>scoreEl.classList.remove("score-pop"),300);
-      h.remove();
-    };
-
-    wrap.appendChild(h);
-    setTimeout(()=>h.remove(),4500);
-  }, 900);
-}
-
 /* ---------- No button 12-step exact behavior ---------- */
 const noMessages = [
   "Wait... are you sure ? 🥺",
@@ -257,15 +485,12 @@ function handleNoClick(){
 }
 noBtn.addEventListener('click', handleNoClick);
 
-/* ---------- Yes click: transition + start effects ---------- */
+/* ---------- Yes click: transition to GAME ---------- */
 const intro = document.getElementById('intro');
 const result = document.getElementById('result');
+const gameScreen = document.getElementById('gameScreen');
 const music = document.getElementById('music');
-
-document.getElementById('yesBtn').addEventListener('click', ()=> {
-  yesClick();
-  setTimeout(startCatchGame, 1200);
-});
+document.getElementById('yesBtn').addEventListener('click', ()=> yesClick());
 
 function yesClick(){
   // play audio (user gesture allows)
@@ -274,8 +499,15 @@ function yesClick(){
   stopFloatingHearts();
   clearInterval(tinyHeartInterval); tinyHeartInterval = null;
 
-  // show result
+  // show GAME screen instead of result
   intro.classList.add('hidden');
+  setTimeout(()=>{
+    gameScreen.classList.remove('hidden');
+  }, 260);
+}
+
+function showResult(){
+  gameScreen.classList.add('hidden');
   setTimeout(()=>{
     result.classList.remove('hidden');
     result.setAttribute('aria-hidden','false');
@@ -297,6 +529,238 @@ function fadeVolume(audio, target=0.8, duration=1200){
     audio.volume = clamp(start + (target-start)*(i/steps), 0, 1);
     if(i>=steps) clearInterval(iv);
   }, stepTime);
+}
+
+/* ================== CATCH THE HEARTS GAME ================== */
+const GAME_CONFIG = {
+  easy: { heartCount: 5, speed: 1.5, spawnDelay: 800, heartLife: 4000, target: 5 },
+  medium: { heartCount: 8, speed: 2.5, spawnDelay: 600, heartLife: 3000, target: 7 },
+  hard: { heartCount: 12, speed: 4, spawnDelay: 400, heartLife: 2000, target: 10 }
+};
+
+let gameState = {
+  score: 0,
+  target: 5,
+  hearts: [],
+  gameActive: false,
+  spawnInterval: null,
+  difficulty: 'easy'
+};
+
+const heartEmojis = ['💖', '💕', '💗', '💘', '💝', '💓', '❤️', '💞'];
+
+function startGame(difficulty) {
+  const config = GAME_CONFIG[difficulty];
+  gameState = {
+    score: 0,
+    target: config.target,
+    hearts: [],
+    gameActive: true,
+    spawnInterval: null,
+    difficulty: difficulty
+  };
+  
+  document.getElementById('difficultySelector').style.display = 'none';
+  document.getElementById('timerBar').style.display = 'block';
+  document.getElementById('gameInstruction').style.display = 'block';
+  document.getElementById('scoreValue').textContent = '0';
+  document.getElementById('targetScore').textContent = config.target;
+  document.getElementById('timerFill').style.width = '100%';
+  
+  // Clear game area
+  document.getElementById('gameArea').innerHTML = '';
+  
+  // Spawn hearts periodically
+  spawnHeart(config);
+  gameState.spawnInterval = setInterval(() => {
+    if (gameState.gameActive && gameState.hearts.length < config.heartCount) {
+      spawnHeart(config);
+    }
+  }, config.spawnDelay);
+}
+
+function spawnHeart(config) {
+  if (!gameState.gameActive) return;
+  
+  const heart = document.createElement('div');
+  heart.className = 'game-heart';
+  heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+  
+  // Random position
+  const x = 50 + Math.random() * (innerWidth - 150);
+  const y = 100 + Math.random() * (innerHeight - 250);
+  heart.style.left = x + 'px';
+  heart.style.top = y + 'px';
+  heart.style.fontSize = (40 + Math.random() * 25) + 'px';
+  
+  // Movement properties
+  const heartData = {
+    element: heart,
+    x: x,
+    y: y,
+    vx: (Math.random() - 0.5) * config.speed * 2,
+    vy: (Math.random() - 0.5) * config.speed * 2,
+    life: config.heartLife,
+    startLife: config.heartLife
+  };
+  
+  // Click/tap handler
+  heart.addEventListener('click', (e) => catchHeart(e, heartData));
+  heart.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    catchHeart(e, heartData);
+  }, { passive: false });
+  
+  document.getElementById('gameArea').appendChild(heart);
+  gameState.hearts.push(heartData);
+  
+  // Animate heart
+  animateGameHeart(heartData, config);
+}
+
+function animateGameHeart(heartData, config) {
+  if (!gameState.gameActive || !heartData.element.parentNode) return;
+  
+  // Update position
+  heartData.x += heartData.vx;
+  heartData.y += heartData.vy;
+  
+  // Bounce off walls
+  if (heartData.x < 30 || heartData.x > innerWidth - 80) heartData.vx *= -1;
+  if (heartData.y < 80 || heartData.y > innerHeight - 120) heartData.vy *= -1;
+  
+  // Keep in bounds
+  heartData.x = clamp(heartData.x, 30, innerWidth - 80);
+  heartData.y = clamp(heartData.y, 80, innerHeight - 120);
+  
+  heartData.element.style.left = heartData.x + 'px';
+  heartData.element.style.top = heartData.y + 'px';
+  
+  // Update life/timer
+  heartData.life -= 16;
+  const lifePercent = heartData.life / heartData.startLife;
+  heartData.element.style.opacity = 0.4 + lifePercent * 0.6;
+  
+  // Update timer bar (based on average heart life)
+  const avgLife = gameState.hearts.reduce((sum, h) => sum + h.life / h.startLife, 0) / Math.max(1, gameState.hearts.length);
+  document.getElementById('timerFill').style.width = (avgLife * 100) + '%';
+  
+  // Remove if expired
+  if (heartData.life <= 0) {
+    removeHeart(heartData, false);
+    return;
+  }
+  
+  requestAnimationFrame(() => animateGameHeart(heartData, config));
+}
+
+function catchHeart(e, heartData) {
+  if (!gameState.gameActive) return;
+  
+  const rect = heartData.element.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  
+  // Vibration feedback
+  try { if (navigator.vibrate) navigator.vibrate(50); } catch(err) {}
+  
+  // Create heart trail burst
+  createHeartTrail(x, y);
+  
+  // Create catch burst effect
+  createCatchBurst(x, y);
+  
+  // Create score float animation
+  createScoreFloat(x, y);
+  
+  // Update score
+  gameState.score++;
+  const scoreEl = document.getElementById('scoreValue');
+  scoreEl.textContent = gameState.score;
+  scoreEl.classList.remove('score-pop');
+  void scoreEl.offsetWidth; // Trigger reflow
+  scoreEl.classList.add('score-pop');
+  
+  // Remove heart
+  removeHeart(heartData, true);
+  
+  // Check win condition
+  if (gameState.score >= gameState.target) {
+    gameComplete();
+  }
+}
+
+function createHeartTrail(x, y) {
+  const trailHearts = ['💕', '💖', '💗', '💓', '✨'];
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const trail = document.createElement('div');
+      trail.className = 'heart-trail';
+      trail.textContent = trailHearts[Math.floor(Math.random() * trailHearts.length)];
+      trail.style.left = (x + (Math.random() - 0.5) * 60) + 'px';
+      trail.style.top = (y + (Math.random() - 0.5) * 60) + 'px';
+      trail.style.fontSize = (15 + Math.random() * 15) + 'px';
+      document.body.appendChild(trail);
+      setTimeout(() => trail.remove(), 600);
+    }, i * 30);
+  }
+}
+
+function createCatchBurst(x, y) {
+  const burst = document.createElement('div');
+  burst.className = 'catch-burst';
+  burst.innerHTML = '💥';
+  burst.style.left = x + 'px';
+  burst.style.top = y + 'px';
+  burst.style.fontSize = '60px';
+  document.body.appendChild(burst);
+  setTimeout(() => burst.remove(), 500);
+}
+
+function createScoreFloat(x, y) {
+  const scoreFloat = document.createElement('div');
+  scoreFloat.className = 'score-float';
+  scoreFloat.textContent = '+1 💖';
+  scoreFloat.style.left = x + 'px';
+  scoreFloat.style.top = y + 'px';
+  document.body.appendChild(scoreFloat);
+  setTimeout(() => scoreFloat.remove(), 1000);
+}
+
+function removeHeart(heartData, caught) {
+  const idx = gameState.hearts.indexOf(heartData);
+  if (idx > -1) gameState.hearts.splice(idx, 1);
+  if (heartData.element.parentNode) {
+    heartData.element.remove();
+  }
+}
+
+function gameComplete() {
+  gameState.gameActive = false;
+  clearInterval(gameState.spawnInterval);
+  
+  // Clear remaining hearts
+  gameState.hearts.forEach(h => h.element.remove());
+  gameState.hearts = [];
+  
+  // Strong vibration for completion
+  try { if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]); } catch(err) {}
+  
+  // Show completion overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'game-complete-overlay';
+  overlay.innerHTML = `
+    <div class="trophy">🏆</div>
+    <div class="complete-text">You Caught All The Love!</div>
+    <div class="final-score">Final Score: ${gameState.score} 💖</div>
+  `;
+  gameScreen.appendChild(overlay);
+  
+  // Transition to result after celebration
+  setTimeout(() => {
+    overlay.remove();
+    showResult();
+  }, 2500);
 }
 
 /* ---------------- FIREWORKS ----------------
@@ -404,6 +868,13 @@ function startFireworks(){
     shells.push(wrapper);
   };
 }
+
+/* Replace your existing megaBurst() with this version.
+   It:
+   - temporarily reduces particle count & max shells
+   - staggers smaller explosions over ~900ms (instead of all at once)
+   - optionally pauses confetti/petals if those pause helpers exist
+*/
 
 function megaBurst() {
   // safety: make sure fireworks system exists
