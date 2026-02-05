@@ -1,129 +1,100 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Valentine 💖</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{
-  height:100%;
-  background:#0b0412;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  overflow:hidden;
+  /* ---------- Base & Layout ---------- */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0b0412;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
+  /* canvases will be inside the result container (so intro is untouched) */
+  .anim-canvas{position:absolute;inset:0;pointer-events:none;display:block}
+  #fireworks{z-index:2}
+  #confetti{z-index:3}
+  #petals{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;transition:.45s ease;z-index:10}
+  .hidden{opacity:0;pointer-events:none;transform:scale(.98)}
+  #intro{background:linear-gradient(135deg,#fff0f5,#ffe6ef,#ffd6e8)}
+
+  .name{font-family:'Pacifico',cursive;font-size:clamp(36px,6vw,64px);color:#d81b60;margin-bottom:8px;text-shadow:0 0 18px rgba(255,105,180,.45)}
+  .question{font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,30px);color:#b0124a;margin-bottom:18px}
+  .buttons{display:flex;gap:16px}
+  button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:pointer;font-size:1rem;transition:transform .18s ease,box-shadow .18s}
+  button:active{transform:translateY(1px)}
+  .yes{background:linear-gradient(135deg,#ff7aa2,#ff3d81);color:#fff;box-shadow:0 12px 30px rgba(255,105,180,.18)}
+  .no{background:#fff;color:#333;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+
+  /* floating hearts (intro) */
+  .floating-heart{position:fixed;z-index:11;font-size:18px;pointer-events:none;opacity:0;transform:translateY(6px)}
+  @keyframes heartFloat{0%{opacity:0;transform:translateY(18px) scale(.94)}20%{opacity:1}80%{opacity:1}100%{opacity:0;transform:translateY(-48px) scale(1.06)}}
+
+  /* tiny hearts */
+  .tiny-heart{position:fixed;z-index:11;font-size:12px;pointer-events:none;opacity:0;transform:translateY(6px);filter:blur(.2px)}
+  @keyframes tinyFloat{0%{opacity:0;transform:translateY(10px) scale(.9)}20%{opacity:0.8}80%{opacity:0.8}100%{opacity:0;transform:translateY(-36px) scale(1)}}
+
+  /* result / header */
+  #result{background:linear-gradient(180deg,#0b0412,#0b0412);color:#fff;overflow:hidden}
+  .result-layer{position:relative;z-index:20;/* ensures text & GIF are above anim layers */}
+  .result-title{font-family:'Pacifico',cursive;font-size:clamp(36px,8vw,68px);color:#ff5e9d;text-shadow:0 6px 26px rgba(255,90,150,.25);white-space:nowrap;display:flex;align-items:center;gap:.6rem;justify-content:center}
+  .result-sub{color:#ffd6e8;margin-top:8px;font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,28px)}
+  #photo{width:min(86vw,520px);border-radius:14px;border:3px solid rgba(255,105,180,.18);box-shadow:0 24px 60px rgba(0,0,0,.6);margin:18px 0}
+
+  /* petal element */
+  .petal{position:absolute;width:36px;height:44px;transform-origin:center;will-change:transform,opacity;pointer-events:none}
+  main{position:relative;z-index:1}
+</style>
+  <style>
+/* 🎮 Catch-the-Heart Game (overlay only) */
+#heartGame{
+  position:absolute;
+  inset:0;
+  z-index:15;          /* below text, above animations */
+  pointer-events:auto;
 }
 
-.screen{
-  position:fixed; inset:0;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  text-align:center; padding:28px;
-  transition:.45s ease;
-  z-index:10;
-}
-.hidden{opacity:0;pointer-events:none;transform:scale(.98)}
-
-#intro{
-  background:linear-gradient(135deg,#fff0f5,#ffe6ef,#ffd6e8);
-}
-
-.name{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(36px,6vw,64px);
-  color:#d81b60;
-}
-.question{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(20px,4vw,30px);
-  color:#b0124a;
-  margin:16px 0;
-}
-
-.buttons{display:flex;gap:16px}
-button{
-  padding:12px 30px;
-  border-radius:999px;
-  border:none;
-  font-weight:700;
-  cursor:pointer;
-  font-size:1rem;
-}
-.yes{background:linear-gradient(135deg,#ff7aa2,#ff3d81);color:#fff}
-.no{background:#fff;color:#333}
-
-/* floating hearts */
-.floating-heart{
-  position:fixed;
-  pointer-events:none;
-  opacity:0;
-  animation:heartFloat 5.5s ease forwards;
-}
-@keyframes heartFloat{
-  0%{opacity:0;transform:translateY(30px)}
-  20%{opacity:1}
-  100%{opacity:0;transform:translateY(-90px)}
-}
-
-/* RESULT */
-#result{
-  background:#0b0412;
-  color:#fff;
-}
-.result-layer{z-index:20;position:relative}
-.result-title{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(36px,7vw,68px);
-  color:#ff5e9d;
-}
-.result-sub{
-  font-family:'Pacifico',cursive;
-  font-size:clamp(18px,3.5vw,28px);
-  color:#ffd6e8;
-}
-#photo{
-  width:min(85vw,520px);
-  border-radius:16px;
-  margin:18px 0;
-  box-shadow:0 20px 60px rgba(0,0,0,.6);
-}
-
-/* GAME */
-#heartGame{position:absolute; inset:0; z-index:15}
 #heartHUD{
-  position:absolute; top:16px; left:50%;
+  position:absolute;
+  top:16px;
+  left:50%;
   transform:translateX(-50%);
   font-family:'Pacifico',cursive;
-  color:#ffd6e8; font-size:22px;
+  color:#ffd6e8;
+  font-size:22px;
+  text-shadow:0 4px 14px rgba(255,90,150,.35);
 }
+
 .catch-heart{
   position:absolute;
-  font-size:32px;
+  font-size:34px;
   cursor:pointer;
   animation:floatUp 4s ease forwards;
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));
 }
+
 @keyframes floatUp{
-  0%{opacity:0;transform:translateY(40px)}
+  0%{opacity:0;transform:translateY(40px) scale(.9)}
   20%{opacity:1}
-  100%{opacity:0;transform:translateY(-140px)}
+  100%{opacity:0;transform:translateY(-160px) scale(1.1)}
 }
-.score-pop{animation:pop .35s ease}
-@keyframes pop{
-  0%{transform:scale(1)}
+
+.score-pop{
+  animation:scorePop .35s ease;
+}
+@keyframes scorePop{
   50%{transform:scale(1.4)}
-  100%{transform:scale(1)}
 }
 </style>
 </head>
-
 <body>
 
+<!-- audio -->
 <audio id="music" src="make-you-mine.mp3" preload="auto" loop></audio>
 
-<!-- INTRO -->
-<div id="intro" class="screen">
+<!-- INTRO (unchanged visuals) -->
+<div id="intro" class="screen" role="region" aria-label="intro-screen">
   <h1 class="name">❤️ Mea ❤️</h1>
   <h2 class="question">Will you be my Valentine? 💖</h2>
   <div class="buttons">
@@ -132,125 +103,473 @@ button{
   </div>
 </div>
 
-<!-- RESULT -->
-<div id="result" class="screen hidden">
-  <div id="heartGame">
-    <div id="heartHUD">💖 Love: <span id="score">0</span></div>
-  </div>
+<!-- RESULT (contains animation canvases & petal layer so they are visible when shown) -->
+<div id="result" class="screen hidden" aria-hidden="true" role="region" aria-label="result-screen">
+  <!-- animation layers (inside result) -->
+  <canvas id="fireworks" class="anim-canvas" aria-hidden="true"></canvas>
+  <canvas id="confetti" class="anim-canvas" aria-hidden="true"></canvas>
+  <div id="petals" aria-hidden="true"></div>
+  <!-- 🎮 Catch Game Overlay -->
+<div id="heartGame">
+  <div id="heartHUD">💖 Love: <span id="heartScore">0</span>/5</div>
+</div>
 
+  <!-- content layer (above animation layers) -->
   <div class="result-layer">
     <div class="result-title">💖 GREAT CHOICE 💖</div>
-    <div class="result-sub">I knew you loved me 😘</div>
-    <img id="photo" src="https://media.giphy.com/media/ch6BQvE0MWlB6/giphy.gif">
-    <div class="result-sub">I Love You ❤️</div>
+    <div class="result-sub" style="margin-top:8px">I knew you loved me 😘</div>
+    <!-- GIF (kept) -->
+    <img id="photo" src="https://media.giphy.com/media/ch6BQvE0MWlB6/giphy.gif" alt="celebration gif">
+    <div class="result-sub" id="loveText">I Love You ❤️</div>
   </div>
 </div>
 
 <script>
-/* ---------------- HELPERS ---------------- */
-const rand=(a,b)=>a+Math.random()*(b-a);
+/* ---------------- CONFIG (tweak for performance) ----------------
+  If device lags, reduce:
+   - CONFIG.MAX_SHELLS
+   - CONFIG.PARTICLES_PER_SHELL
+   - CONFIG.PETAL_SPAWN_MS (increase)
+   - CONFIG.PETAL_MAX
+   - CONFIG.CONFETTI_COUNT
+------------------------------------------------------------------*/
+const CONFIG = {
+  DPR_MAX: 2,
+  MAX_SHELLS: 4,
+  PARTICLES_PER_SHELL: 80,   // per explosion
+  PETAL_SPAWN_MS: 240,       // spawn interval for petals (ms)
+  PETAL_MAX: 60,             // maximum simultaneous petals
+  CONFETTI_COUNT: 60
+};
 
-/* ---------------- DOM REFS (CRITICAL) ---------------- */
-const yesBtn = document.getElementById("yesBtn");
-const noBtn  = document.getElementById("noBtn");
-const intro  = document.getElementById("intro");
-const result = document.getElementById("result");
-const music  = document.getElementById("music");
+/* ---------- helpers ---------- */
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const rand = (a,b)=> a + Math.random()*(b-a);
 
-/* ---------------- FLOATING HEARTS ---------------- */
-const introHearts = setInterval(()=>{
-  const h=document.createElement("div");
-  h.className="floating-heart";
-  h.textContent="💖";
-  h.style.left=rand(5,95)+"vw";
-  h.style.top=rand(30,70)+"vh";
-  h.style.fontSize=rand(14,26)+"px";
-  document.body.appendChild(h);
-  setTimeout(()=>h.remove(),6000);
-},700);
+/* ================== INTRO HEARTS ================== */
+let heartInterval;
+function startFloatingHearts(){
+  if(heartInterval) return;
+  heartInterval = setInterval(()=>{
+    const el = document.createElement('div');
+    el.className = 'floating-heart';
+    el.style.left = (5 + Math.random()*90) + 'vw';
+    el.style.top  = (20 + Math.random()*55) + 'vh';
+    el.style.fontSize = (12 + Math.random()*18) + 'px';
+    el.textContent = ['💖','💕','💗','💘'][Math.floor(Math.random()*4)];
+    el.style.animation = `heartFloat ${4.6 + Math.random()*2.6}s cubic-bezier(.2,.8,.2,1) forwards`;
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 9000);
+  }, 600);
+}
+function stopFloatingHearts(){
+  if(heartInterval){ clearInterval(heartInterval); heartInterval = null; }
+}
+startFloatingHearts();
 
-/* ---------------- YES CLICK ---------------- */
-yesBtn.addEventListener("click", yesClick);
+/* additional tiny hearts */
+let tinyHeartInterval;
+function startTinyHearts(){
+  if(tinyHeartInterval) return;
+  tinyHeartInterval = setInterval(()=>{
+    const el = document.createElement('div');
+    el.className = 'tiny-heart';
+    el.style.left = (8 + Math.random()*84) + 'vw';
+    el.style.top  = (30 + Math.random()*50) + 'vh';
+    el.textContent = ['💓','💟','💝'][Math.floor(Math.random()*3)];
+    el.style.animation = `tinyFloat ${2.6 + Math.random()*2.2}s ease-in forwards`;
+    el.style.opacity = (0.5 + Math.random()*0.5).toFixed(2);
+    el.style.fontSize = (8 + Math.random()*8) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 3600);
+  }, 280);
+}
+startTinyHearts();
+
+/* ---------- No button 12-step exact behavior ---------- */
+const noMessages = [
+  "Wait... are you sure ? 🥺",
+  "Really?",
+  "Try Again !",
+  "You Sure ?",
+  "Haha nice try!",
+  "No escape!",
+  "Nice try 😜",
+  "You can't escape my love 💘",
+  "Still no? Really? 😂",
+  "You're testing my patience 🥲",
+  "Nope, not happening 🙅🏻"
+];
+let noClicks = 0;
+const noBtn = document.getElementById('noBtn');
+
+function handleNoClick(){
+  if(noClicks < noMessages.length){
+    noBtn.textContent = noMessages[noClicks];
+    noBtn.style.position = 'fixed';
+    noBtn.style.left = (20 + Math.random()*(innerWidth-160)) + 'px';
+    noBtn.style.top  = (20 + Math.random()*(innerHeight-120)) + 'px';
+    noClicks++;
+    return;
+  }
+  // 12th click -> become Yes visually + behavior
+  noBtn.textContent = 'Yes! 💕';
+  noBtn.style.position = 'static';
+  noBtn.classList.remove('no');
+  noBtn.classList.add('yes');
+  noBtn.removeEventListener('click', handleNoClick);
+  noBtn.addEventListener('click', ()=> yesClick());
+}
+noBtn.addEventListener('click', handleNoClick);
+
+/* ---------- Yes click: transition + start effects ---------- */
+const intro = document.getElementById('intro');
+const result = document.getElementById('result');
+const music = document.getElementById('music');
+document.getElementById('yesBtn').addEventListener('click', ()=> yesClick());
 
 function yesClick(){
-  clearInterval(introHearts);
+  // play audio (user gesture allows)
+  try{ music.volume = 0; music.play(); fadeVolume(music, 0.75, 1400); }catch(e){}
+  // stop intro hearts
+  stopFloatingHearts();
+  clearInterval(tinyHeartInterval); tinyHeartInterval = null;
 
-  try{
-    music.volume=0;
-    music.play();
-    let v=0;
-    const iv=setInterval(()=>{
-      v+=0.05;
-      music.volume=v;
-      if(v>=0.8) clearInterval(iv);
-    },80);
-  }catch(e){}
-
-  intro.classList.add("hidden");
+  // show result
+  intro.classList.add('hidden');
   setTimeout(()=>{
-    result.classList.remove("hidden");
-    startCatchGame();
-  },300);
+    result.classList.remove('hidden');
+    result.setAttribute('aria-hidden','false');
+    // start animation layers (they are inside result and will be visible)
+    startPetalSpawner();
+    startFireworks();
+    startConfetti();
+    setTimeout(()=> textFirework("I LOVE YOU"), 900);
+    setTimeout(()=> megaBurst(), 1500);
+  }, 260);
+}
+function fadeVolume(audio, target=0.8, duration=1200){
+  const stepTime=80, steps = Math.max(1, Math.floor(duration/stepTime));
+  const start = audio.volume;
+  let i=0;
+  const iv=setInterval(()=>{
+    i++;
+    audio.volume = clamp(start + (target-start)*(i/steps), 0, 1);
+    if(i>=steps) clearInterval(iv);
+  }, stepTime);
 }
 
-/* ---------------- NO BUTTON (12 STEPS) ---------------- */
-const noMessages=[
- "Wait... are you sure ? 🥺",
- "Really?",
- "Try Again!",
- "You sure?",
- "Haha nice try!",
- "No escape!",
- "Nice try 😜",
- "You can't escape my love 💘",
- "Still no? 😂",
- "You're testing me 🥲",
- "Nope, not happening 🙅🏻"
-];
-let noClicks=0;
-
-function handleNo(){
-  if(noClicks<noMessages.length){
-    noBtn.textContent=noMessages[noClicks++];
-    noBtn.style.position="fixed";
-    noBtn.style.left=rand(10,80)+"vw";
-    noBtn.style.top=rand(20,70)+"vh";
-  }else{
-    noBtn.textContent="Yes! 💕";
-    noBtn.className="yes";
-    noBtn.style.position="static";
-    noBtn.removeEventListener("click",handleNo);
-    noBtn.addEventListener("click",yesClick);
+/* ---------------- FIREWORKS ----------------
+  - additive blending
+  - colored particles with subtle glow (no hard white halo)
+  - limited shells for performance
+-------------------------------------------*/
+function startFireworks(){
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d', { alpha:true });
+  const DPR = Math.min(CONFIG.DPR_MAX, window.devicePixelRatio || 1);
+  function resize(){
+    canvas.width = innerWidth * DPR;
+    canvas.height = innerHeight * DPR;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
   }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const gravity = 0.04;
+  let shells = [];
+
+  function launchShell(x=null, hue=null, type=null){
+    if(shells.length >= CONFIG.MAX_SHELLS) return;
+    const sx = x ?? rand(60, innerWidth-60);
+    shells.push({
+      x: sx,
+      y: innerHeight + 20,
+      vy: -7 - Math.random()*2.8,
+      target: rand(innerHeight*0.2, innerHeight*0.45),
+      hue: hue ?? rand(320, 360),
+      type: type ?? (Math.random()>0.6 ? 'ring' : 'chrys'),
+      trail: [],
+      particles: [],
+      exploded:false
+    });
+  }
+
+  // auto-launch shells with varying intervals for natural feel
+  const autoLaunch = setInterval(()=> launchShell(), 700);
+
+  function explode(shell){
+    const count = CONFIG.PARTICLES_PER_SHELL;
+    for(let i=0;i<count;i++){
+      let angle = Math.random()*Math.PI*2;
+      if(shell.type === 'ring') angle = (Math.PI*2/count) * i;
+      const speed = (shell.type === 'ring') ? rand(2.8,4.4) : rand(1.6,3.6);
+      shell.particles.push({
+        x: shell.x, y: shell.y,
+        vx: Math.cos(angle)*speed * rand(0.9,1.15),
+        vy: Math.sin(angle)*speed * rand(0.9,1.15),
+        life: 1,
+        size: 1 + Math.random()*2.2,
+        hue: shell.hue + rand(-12, 12)
+      });
+    }
+    // light vibration if available
+    try{ if(navigator.vibrate) navigator.vibrate(35); }catch(e){}
+  }
+
+  (function frame(){
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(10,6,12,0.28)';
+    ctx.fillRect(0,0,innerWidth,innerHeight);
+    ctx.globalCompositeOperation = 'lighter';
+
+    for(let sI=shells.length-1;sI>=0;sI--){
+      const s = shells[sI];
+      if(!s.exploded){
+        s.vy += gravity; s.y += s.vy;
+        s.trail.push({x:s.x,y:s.y,a:1});
+        if(s.trail.length>10) s.trail.shift();
+        s.trail.forEach((t,ti)=>{ const a = (t.a * (1 - ti / s.trail.length)) * 0.75; ctx.fillStyle = `hsla(${s.hue},100%,70%,${a})`; ctx.beginPath(); ctx.arc(t.x, t.y, 2.0, 0, Math.PI*2); ctx.fill(); t.a -= 0.06; });
+        ctx.fillStyle = `hsl(${s.hue},100%,75%)`; ctx.beginPath(); ctx.arc(s.x, s.y, 3.2, 0, Math.PI*2); ctx.fill();
+
+        if(s.y <= s.target){
+          s.exploded = true; explode(s);
+          for(let k=0;k<12;k++){ s.particles.push({ x:s.x,y:s.y, vx:rand(-3,3), vy:rand(-4,1), life: 0.6 + Math.random()*0.2, size: 1.4 + Math.random(), hue: s.hue + rand(-20,20) }); }
+        }
+      } else {
+        for(let pI=s.particles.length-1;pI>=0;pI--){
+          const p = s.particles[pI];
+          p.vy += gravity * 0.45; p.x += p.vx; p.y += p.vy; p.life -= 0.012 + Math.random()*0.006;
+          const alpha = clamp(p.life, 0, 1);
+          ctx.fillStyle = `hsla(${p.hue},100%,60%,${alpha})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = `hsla(${p.hue},100%,65%,${alpha*0.14})`; ctx.beginPath(); ctx.arc(p.x, p.y, p.size*2.6, 0, Math.PI*2); ctx.fill();
+          if(Math.random()>0.96){ ctx.fillStyle = `rgba(255,220,150,${alpha})`; ctx.fillRect(p.x + rand(-3,3), p.y + rand(-3,3), 1.6, 1.6); }
+          if(p.life <= 0) s.particles.splice(pI,1);
+        }
+        if(s.particles.length === 0) shells.splice(sI,1);
+      }
+    }
+    requestAnimationFrame(frame);
+  })();
+
+  // small helpers exposed
+  window._fw_launch = launchShell;
+  window._fw_explode_at = (x,y,hue,type) => {
+    const wrapper = { exploded:true, particles: [] };
+    const fake = { x:x, y:y, hue:hue ?? rand(320,360), type:type ?? 'chrys', particles: wrapper.particles };
+    (function explodeFake(s){ const count = Math.min(70, Math.max(30, Math.floor(CONFIG.PARTICLES_PER_SHELL/1.2))); for(let i=0;i<count;i++){ let angle = Math.random()*Math.PI*2; const speed = rand(1.6,3.2); fake.particles.push({ x:s.x, y:s.y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed, life: 1, size: 1 + Math.random()*1.8, hue: s.hue + rand(-10,10) }); } })(fake);
+    wrapper.particles = fake.particles;
+    shells.push(wrapper);
+  };
 }
-noBtn.addEventListener("click",handleNo);
 
-/* ---------------- GAME ---------------- */
+/* Replace your existing megaBurst() with this version.
+   It:
+   - temporarily reduces particle count & max shells
+   - staggers smaller explosions over ~900ms (instead of all at once)
+   - optionally pauses confetti/petals if those pause helpers exist
+*/
+
+function megaBurst() {
+  // safety: make sure fireworks system exists
+  if (!window._fw_explode_at) return;
+
+  const cx = innerWidth / 2;
+  const cy = innerHeight * 0.45;
+
+  // save current config
+  const prevParticles = CONFIG.PARTICLES_PER_SHELL;
+  const prevMaxShells = CONFIG.MAX_SHELLS;
+  const prevConfetti = CONFIG.CONFETTI_COUNT;
+  const prevPetalMax = CONFIG.PETAL_MAX;
+
+  // reduce intensity (tweak these multipliers for different tradeoffs)
+  CONFIG.PARTICLES_PER_SHELL = Math.max(20, Math.floor(prevParticles * 0.35)); // big reduction
+  CONFIG.MAX_SHELLS = Math.max(1, Math.floor(prevMaxShells * 0.5));
+  CONFIG.CONFETTI_COUNT = Math.max(16, Math.floor(prevConfetti * 0.4));
+  CONFIG.PETAL_MAX = Math.max(10, Math.floor(prevPetalMax * 0.25));
+
+  // If you implemented stop/resume functions for confetti/petals, call them here.
+  // (Optional: if you haven't added them, skipping is fine.)
+  if (typeof window.pauseConfetti === 'function') try { window.pauseConfetti(); } catch(e){}
+  if (typeof window.pausePetals === 'function') try { window.pausePetals(); } catch(e){}
+
+  // schedule a staggered series of lighter bursts rather than one huge spike
+  const hues = [336, 320, 300, 40, 28];
+  let steps = 6;                   // how many staggered rounds
+  const perStep = 2;               // explosions per round
+  const stepMs = 140;              // ms between rounds
+
+  let step = 0;
+  const t = setInterval(() => {
+    // each round spawn 'perStep' moderate bursts near center
+    for (let j = 0; j < perStep; j++) {
+      const offsetX = rand(-90, 90); // spread
+      const offsetY = rand(-40, 40);
+      const hue = hues[(step + j) % hues.length] + rand(-12, 12);
+      // use the helper which spawns a lighter explode (it respects CONFIG.PARTICLES_PER_SHELL)
+      window._fw_explode_at(cx + offsetX, cy + offsetY, hue, 'ring');
+    }
+    step++;
+    if (step >= steps) {
+      clearInterval(t);
+      // restore config after a short delay so trailing particles finish
+      setTimeout(() => {
+        CONFIG.PARTICLES_PER_SHELL = prevParticles;
+        CONFIG.MAX_SHELLS = prevMaxShells;
+        CONFIG.CONFETTI_COUNT = prevConfetti;
+        CONFIG.PETAL_MAX = prevPetalMax;
+        if (typeof window.resumeConfetti === 'function') try { window.resumeConfetti(); } catch(e){}
+        if (typeof window.resumePetals === 'function') try { window.resumePetals(); } catch(e){}
+      }, 650); // leave time for particles to dissipate
+    }
+  }, stepMs);
+}
+
+/* text firework (samples text and spawns particles at the shape) */
+function textFirework(txt){
+  const canvas = document.createElement('canvas'); const scale = 0.5;
+  canvas.width = Math.floor(innerWidth * scale); canvas.height = Math.floor(innerHeight * scale);
+  const tctx = canvas.getContext('2d');
+  tctx.fillStyle='black'; tctx.fillRect(0,0,canvas.width,canvas.height);
+  const fontSize = Math.floor(canvas.width / (txt.length*0.6));
+  tctx.font = `bold ${fontSize}px Pacifico, serif`; tctx.textAlign = 'center'; tctx.fillStyle = 'white';
+  tctx.fillText(txt, canvas.width/2, canvas.height/2 + fontSize*0.3);
+  try{
+    const id = tctx.getImageData(0,0,canvas.width,canvas.height).data; const step = 6;
+    for(let y=0;y<canvas.height;y+=step){ for(let x=0;x<canvas.width;x+=step){
+      const idx = (y*canvas.width + x)*4;
+      if(id[idx] > 120 && Math.random() > 0.68){ window._fw_explode_at(x/scale, y/scale, rand(320,350), 'chrys'); }
+    }}
+  }catch(e){ window._fw_explode_at(innerWidth/2, innerHeight/2, 330, 'chrys'); }
+}
+
+/* ---------------- CONFETTI ---------------- */
+function startConfetti(){
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d', { alpha:true });
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  const count = CONFIG.CONFETTI_COUNT;
+  const bits = [];
+  for(let i=0;i<count;i++){
+    bits.push({ x: Math.random()*innerWidth, y: Math.random()*-innerHeight, vy: 1.6 + Math.random()*3.4, vx: (Math.random()-0.5)*0.9, size: 6 + Math.random()*9, rot: Math.random()*360, rotSpeed: (Math.random()-0.5)*6, color: ['#ff7aa2','#ffd6e8','#ffcfec','#ffd07a'][Math.floor(Math.random()*4)] });
+  }
+  (function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    bits.forEach(b=>{
+      b.x += b.vx; b.y += b.vy; b.rot += b.rotSpeed;
+      if(b.y > innerHeight + 60){ b.y = -40; b.x = Math.random()*innerWidth; }
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.rot * Math.PI/180);
+      const w = b.size, h = b.size * 0.6, r = Math.min(3, w*0.2);
+      ctx.fillStyle = b.color; roundRect(ctx, -w/2, -h/2, w, h, r); ctx.fill(); ctx.restore();
+    });
+    requestAnimationFrame(loop);
+  })();
+}
+function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ---------------- PETALS (DOM with shaded SVG) ----------------*/
+let petalCount = 0;
+function startPetalSpawner(){
+  const wrap = document.getElementById('petals');
+  // clear any old
+  wrap.innerHTML = '';
+  petalCount = 0;
+
+  const spawn = ()=> {
+    if(petalCount >= CONFIG.PETAL_MAX) return;
+    const el = document.createElement('div'); el.className = 'petal';
+    const leftVW = rand(-5, 105);
+    el.style.left = leftVW + 'vw';
+    el.style.top = (-40 - Math.random()*80) + 'px';
+    el.style.opacity = (0.7 + Math.random()*0.3).toFixed(2);
+    const fill = randomPetalFill();
+    const id = 'g' + (Date.now() + Math.floor(Math.random()*9999));
+    el.innerHTML = `
+      <svg viewBox="0 0 60 80" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <radialGradient id="${id}" cx="35%" cy="30%" r="80%">
+            <stop offset="0%" stop-color="${lighten(fill,12)}" stop-opacity="1"/>
+            <stop offset="55%" stop-color="${fill}" stop-opacity="1"/>
+            <stop offset="100%" stop-color="${darken(fill,10)}" stop-opacity="0.95"/>
+          </radialGradient>
+        </defs>
+        <path d="M30 2 C42 10 52 28 48 42 C44 56 34 62 30 62 C26 62 16 56 12 42 C8 28 18 10 30 2Z" fill="url(#${id})" />
+      </svg>
+    `;
+    wrap.appendChild(el); petalCount++;
+    animatePetal(el, leftVW);
+  };
+  // spawn intermittently so petals fall continuously
+  const si = setInterval(()=> spawn(), CONFIG.PETAL_SPAWN_MS);
+  // spawn a small initial burst for immediate feel
+  for(let i=0;i<6;i++) setTimeout(()=> spawn(), i*80);
+
+  // stop spawner on unload
+  window.addEventListener('beforeunload', ()=> clearInterval(si));
+}
+function randomPetalFill(){ const base = ['#d81b60','#ff6b9a','#ff4d7a','#ff83a9']; return base[Math.floor(Math.random()*base.length)]; }
+function lighten(hex, pct){ const c = hexToRgb(hex); return `rgb(${Math.min(255, Math.floor(c.r + (255-c.r)*(pct/100)))},${Math.min(255, Math.floor(c.g + (255-c.g)*(pct/100)))},${Math.min(255, Math.floor(c.b + (255-c.b)*(pct/100)))})`; }
+function darken(hex, pct){ const c = hexToRgb(hex); return `rgb(${Math.max(0, Math.floor(c.r*(1-pct/100)))},${Math.max(0, Math.floor(c.g*(1-pct/100)))},${Math.max(0, Math.floor(c.b*(1-pct/100)))})`; }
+function hexToRgb(hex){ hex = hex.replace('#',''); const bigint = parseInt(hex,16); return { r: (bigint>>16)&255, g: (bigint>>8)&255, b: bigint&255 }; }
+
+function animatePetal(el, startLeftVW){
+  const startX = (startLeftVW/100) * innerWidth;
+  let x = startX; let y = parseFloat(el.style.top); let rot = rand(0,360);
+  const speedY = rand(0.6,1.6); const sway = rand(0.6,2.2); const rotSpeed = rand(-2.2,2.2); const drift = rand(-0.4,0.4);
+  function step(){
+    y += speedY; x += Math.sin(y/50)*sway + drift; rot += rotSpeed;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rot}deg)`;
+    if(y > innerHeight + 120){ el.remove(); petalCount = Math.max(0, petalCount - 1); return; }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ----------------- small performance note ----------------- */
+/* If your phone lags: set CONFIG.MAX_SHELLS = 2, PARTICLES_PER_SHELL = 50, PETAL_SPAWN_MS = 400, PETAL_MAX = 30, CONFETTI_COUNT = 40 */
+  <script>
+/* 🎮 Catch-the-Heart Game (isolated, safe) */
 function startCatchGame(){
-  const wrap=document.getElementById("heartGame");
-  const scoreEl=document.getElementById("score");
-  let score=0;
+  const wrap = document.getElementById("heartGame");
+  const scoreEl = document.getElementById("heartScore");
+  let score = 0;
+  const TARGET = 5;
 
-  const spawn=setInterval(()=>{
-    if(score>=5){clearInterval(spawn);wrap.remove();return;}
-    const h=document.createElement("div");
-    h.className="catch-heart";
-    h.textContent="💖";
-    h.style.left=rand(10,80)+"vw";
-    h.style.top=rand(55,80)+"vh";
+  const spawn = setInterval(()=>{
+    if(score >= TARGET){
+      clearInterval(spawn);
+      wrap.remove();
+      return;
+    }
 
-    h.onclick=e=>{
+    const h = document.createElement("div");
+    h.className = "catch-heart";
+    h.textContent = ["💖","💕","💗","💘"][Math.floor(Math.random()*4)];
+    h.style.left = (10 + Math.random()*80) + "vw";
+    h.style.top  = (55 + Math.random()*25) + "vh";
+
+    h.onclick = ()=>{
       if(navigator.vibrate) navigator.vibrate(30);
       score++;
-      scoreEl.textContent=score;
+      scoreEl.textContent = score;
       scoreEl.classList.add("score-pop");
       setTimeout(()=>scoreEl.classList.remove("score-pop"),300);
       h.remove();
     };
+
     wrap.appendChild(h);
     setTimeout(()=>h.remove(),4500);
-  },900);
+  }, 900);
 }
+
+/* ▶️ Hook game AFTER YES (no changes to original yesClick) */
+document.getElementById("yesBtn").addEventListener("click", ()=>{
+  setTimeout(startCatchGame, 1200);
+});
+</script>
 </script>
 
 </body>
