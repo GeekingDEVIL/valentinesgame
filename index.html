@@ -1,57 +1,102 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Valentine 💖</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
 <style>
-/* ---------- Base & Layout ---------- */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#0b0412;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
-.anim-canvas{position:absolute;inset:0;pointer-events:none;display:block}
-#fireworks{z-index:2}
-#confetti{z-index:3}
-#petals{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{
+  height:100%;
+  background:#0b0412;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  overflow:hidden;
+}
 
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;transition:.45s ease;z-index:10}
+.screen{
+  position:fixed; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:28px;
+  transition:.45s ease;
+  z-index:10;
+}
 .hidden{opacity:0;pointer-events:none;transform:scale(.98)}
-#intro{background:linear-gradient(135deg,#fff0f5,#ffe6ef,#ffd6e8)}
 
-.name{font-family:'Pacifico',cursive;font-size:clamp(36px,6vw,64px);color:#d81b60;margin-bottom:8px;text-shadow:0 0 18px rgba(255,105,180,.45)}
-.question{font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,30px);color:#b0124a;margin-bottom:18px}
+#intro{
+  background:linear-gradient(135deg,#fff0f5,#ffe6ef,#ffd6e8);
+}
+
+.name{
+  font-family:'Pacifico',cursive;
+  font-size:clamp(36px,6vw,64px);
+  color:#d81b60;
+}
+.question{
+  font-family:'Pacifico',cursive;
+  font-size:clamp(20px,4vw,30px);
+  color:#b0124a;
+  margin:16px 0;
+}
+
 .buttons{display:flex;gap:16px}
-button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:pointer;font-size:1rem}
+button{
+  padding:12px 30px;
+  border-radius:999px;
+  border:none;
+  font-weight:700;
+  cursor:pointer;
+  font-size:1rem;
+}
 .yes{background:linear-gradient(135deg,#ff7aa2,#ff3d81);color:#fff}
 .no{background:#fff;color:#333}
 
-/* floating hearts intro */
-.floating-heart{position:fixed;z-index:11;font-size:18px;pointer-events:none;opacity:0}
+/* floating hearts */
+.floating-heart{
+  position:fixed;
+  pointer-events:none;
+  opacity:0;
+  animation:heartFloat 5.5s ease forwards;
+}
 @keyframes heartFloat{
-0%{opacity:0;transform:translateY(18px) scale(.94)}
-20%{opacity:1}
-80%{opacity:1}
-100%{opacity:0;transform:translateY(-48px) scale(1.06)}
+  0%{opacity:0;transform:translateY(30px)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateY(-90px)}
 }
 
-/* result */
-#result{background:#0b0412;color:#fff;overflow:hidden}
-.result-layer{position:relative;z-index:20}
-.result-title{font-family:'Pacifico',cursive;font-size:clamp(36px,8vw,68px);color:#ff5e9d;white-space:nowrap}
-.result-sub{color:#ffd6e8;margin-top:8px;font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,28px)}
-#photo{width:min(86vw,520px);border-radius:14px;margin:18px 0}
-
-/* ---------- 🔹 GAME ADDITION (styles only) ---------- */
-#heartGame{
-  position:absolute; inset:0; z-index:15;
-  pointer-events:auto;
+/* RESULT */
+#result{
+  background:#0b0412;
+  color:#fff;
 }
+.result-layer{z-index:20;position:relative}
+.result-title{
+  font-family:'Pacifico',cursive;
+  font-size:clamp(36px,7vw,68px);
+  color:#ff5e9d;
+}
+.result-sub{
+  font-family:'Pacifico',cursive;
+  font-size:clamp(18px,3.5vw,28px);
+  color:#ffd6e8;
+}
+#photo{
+  width:min(85vw,520px);
+  border-radius:16px;
+  margin:18px 0;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+/* GAME */
+#heartGame{position:absolute; inset:0; z-index:15}
 #heartHUD{
   position:absolute; top:16px; left:50%;
   transform:translateX(-50%);
   font-family:'Pacifico',cursive;
   color:#ffd6e8; font-size:22px;
-  display:flex; gap:18px;
 }
 .catch-heart{
   position:absolute;
@@ -64,16 +109,15 @@ button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:
   20%{opacity:1}
   100%{opacity:0;transform:translateY(-140px)}
 }
-.combo-pop{
-  animation:comboPop .35s ease;
-}
-@keyframes comboPop{
+.score-pop{animation:pop .35s ease}
+@keyframes pop{
   0%{transform:scale(1)}
-  50%{transform:scale(1.5)}
+  50%{transform:scale(1.4)}
   100%{transform:scale(1)}
 }
 </style>
 </head>
+
 <body>
 
 <audio id="music" src="make-you-mine.mp3" preload="auto" loop></audio>
@@ -90,16 +134,8 @@ button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:
 
 <!-- RESULT -->
 <div id="result" class="screen hidden">
-  <canvas id="fireworks" class="anim-canvas"></canvas>
-  <canvas id="confetti" class="anim-canvas"></canvas>
-  <div id="petals"></div>
-
-  <!-- 🔹 GAME ADDITION -->
   <div id="heartGame">
-    <div id="heartHUD">
-      <div>💖 <span id="score">0</span></div>
-      <div>🔥 x<span id="combo">1</span></div>
-    </div>
+    <div id="heartHUD">💖 Love: <span id="score">0</span></div>
   </div>
 
   <div class="result-layer">
@@ -111,69 +147,111 @@ button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:
 </div>
 
 <script>
-/* helpers */
+/* ---------------- HELPERS ---------------- */
 const rand=(a,b)=>a+Math.random()*(b-a);
 
-/* intro hearts */
-setInterval(()=>{
-  const h=document.createElement('div');
-  h.className='floating-heart';
-  h.textContent='💖';
-  h.style.left=rand(5,95)+'vw';
-  h.style.top=rand(25,70)+'vh';
-  h.style.animation=`heartFloat ${rand(4.5,7)}s ease forwards`;
+/* ---------------- DOM REFS (CRITICAL) ---------------- */
+const yesBtn = document.getElementById("yesBtn");
+const noBtn  = document.getElementById("noBtn");
+const intro  = document.getElementById("intro");
+const result = document.getElementById("result");
+const music  = document.getElementById("music");
+
+/* ---------------- FLOATING HEARTS ---------------- */
+const introHearts = setInterval(()=>{
+  const h=document.createElement("div");
+  h.className="floating-heart";
+  h.textContent="💖";
+  h.style.left=rand(5,95)+"vw";
+  h.style.top=rand(30,70)+"vh";
+  h.style.fontSize=rand(14,26)+"px";
   document.body.appendChild(h);
-  setTimeout(()=>h.remove(),8000);
-},600);
+  setTimeout(()=>h.remove(),6000);
+},700);
 
-/* yes click */
-yesBtn.onclick=()=>{
-  music.volume=0; music.play();
-  let v=0; const iv=setInterval(()=>{v+=.05;music.volume=v;if(v>=.75)clearInterval(iv)},80);
-  intro.classList.add('hidden');
+/* ---------------- YES CLICK ---------------- */
+yesBtn.addEventListener("click", yesClick);
+
+function yesClick(){
+  clearInterval(introHearts);
+
+  try{
+    music.volume=0;
+    music.play();
+    let v=0;
+    const iv=setInterval(()=>{
+      v+=0.05;
+      music.volume=v;
+      if(v>=0.8) clearInterval(iv);
+    },80);
+  }catch(e){}
+
+  intro.classList.add("hidden");
   setTimeout(()=>{
-    result.classList.remove('hidden');
-    startCatchGame();   // 🔹 game starts here
-  },260);
-};
+    result.classList.remove("hidden");
+    startCatchGame();
+  },300);
+}
 
-/* ---------- 🔹 GAME ADDITION (logic) ---------- */
+/* ---------------- NO BUTTON (12 STEPS) ---------------- */
+const noMessages=[
+ "Wait... are you sure ? 🥺",
+ "Really?",
+ "Try Again!",
+ "You sure?",
+ "Haha nice try!",
+ "No escape!",
+ "Nice try 😜",
+ "You can't escape my love 💘",
+ "Still no? 😂",
+ "You're testing me 🥲",
+ "Nope, not happening 🙅🏻"
+];
+let noClicks=0;
+
+function handleNo(){
+  if(noClicks<noMessages.length){
+    noBtn.textContent=noMessages[noClicks++];
+    noBtn.style.position="fixed";
+    noBtn.style.left=rand(10,80)+"vw";
+    noBtn.style.top=rand(20,70)+"vh";
+  }else{
+    noBtn.textContent="Yes! 💕";
+    noBtn.className="yes";
+    noBtn.style.position="static";
+    noBtn.removeEventListener("click",handleNo);
+    noBtn.addEventListener("click",yesClick);
+  }
+}
+noBtn.addEventListener("click",handleNo);
+
+/* ---------------- GAME ---------------- */
 function startCatchGame(){
-  const wrap=document.getElementById('heartGame');
-  const scoreEl=document.getElementById('score');
-  const comboEl=document.getElementById('combo');
+  const wrap=document.getElementById("heartGame");
+  const scoreEl=document.getElementById("score");
+  let score=0;
 
-  let score=0, combo=1, lastHit=0, TARGET=8;
+  const spawn=setInterval(()=>{
+    if(score>=5){clearInterval(spawn);wrap.remove();return;}
+    const h=document.createElement("div");
+    h.className="catch-heart";
+    h.textContent="💖";
+    h.style.left=rand(10,80)+"vw";
+    h.style.top=rand(55,80)+"vh";
 
-  function spawn(){
-    if(score>=TARGET){ wrap.remove(); return; }
-
-    const h=document.createElement('div');
-    h.className='catch-heart';
-    h.textContent='💖';
-    h.style.left=rand(10,80)+'vw';
-    h.style.top=rand(55,80)+'vh';
-
-    h.onclick=()=>{
-      const now=Date.now();
-      combo = (now-lastHit<1200)? combo+1 : 1;
-      lastHit=now;
-
-      score += combo;
-      scoreEl.textContent=score;
-      comboEl.textContent=combo;
-      comboEl.classList.add('combo-pop');
-      setTimeout(()=>comboEl.classList.remove('combo-pop'),300);
-
+    h.onclick=e=>{
       if(navigator.vibrate) navigator.vibrate(30);
+      score++;
+      scoreEl.textContent=score;
+      scoreEl.classList.add("score-pop");
+      setTimeout(()=>scoreEl.classList.remove("score-pop"),300);
       h.remove();
     };
     wrap.appendChild(h);
     setTimeout(()=>h.remove(),4500);
-  }
-  const si=setInterval(spawn,850);
-  setTimeout(()=>{clearInterval(si);wrap.remove();},15000);
+  },900);
 }
 </script>
+
 </body>
 </html>
