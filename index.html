@@ -1,204 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Valentine 💖</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <style>
-  * {
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-  }
+/* ---------- Base & Layout ---------- */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#0b0412;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
+.anim-canvas{position:absolute;inset:0;pointer-events:none;display:block}
+#fireworks{z-index:2}
+#confetti{z-index:3}
+#petals{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
 
-  body {
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-    background: radial-gradient(circle at bottom, #ff5f9e, #ff2d6f);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: white;
-  }
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;transition:.45s ease;z-index:10}
+.hidden{opacity:0;pointer-events:none;transform:scale(.98)}
+#intro{background:linear-gradient(135deg,#fff0f5,#ffe6ef,#ffd6e8)}
 
-  canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-  }
+.name{font-family:'Pacifico',cursive;font-size:clamp(36px,6vw,64px);color:#d81b60;margin-bottom:8px;text-shadow:0 0 18px rgba(255,105,180,.45)}
+.question{font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,30px);color:#b0124a;margin-bottom:18px}
+.buttons{display:flex;gap:16px}
+button{padding:12px 30px;border-radius:999px;border:none;font-weight:700;cursor:pointer;font-size:1rem}
+.yes{background:linear-gradient(135deg,#ff7aa2,#ff3d81);color:#fff}
+.no{background:#fff;color:#333}
 
-  .container {
-    z-index: 10;
-    width: 100%;
-    padding: 20px;
-  }
+/* floating hearts intro */
+.floating-heart{position:fixed;z-index:11;font-size:18px;pointer-events:none;opacity:0}
+@keyframes heartFloat{
+0%{opacity:0;transform:translateY(18px) scale(.94)}
+20%{opacity:1}
+80%{opacity:1}
+100%{opacity:0;transform:translateY(-48px) scale(1.06)}
+}
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 40px;
-    animation: heartbeat 1.4s infinite;
-  }
+/* result */
+#result{background:#0b0412;color:#fff;overflow:hidden}
+.result-layer{position:relative;z-index:20}
+.result-title{font-family:'Pacifico',cursive;font-size:clamp(36px,8vw,68px);color:#ff5e9d;white-space:nowrap}
+.result-sub{color:#ffd6e8;margin-top:8px;font-family:'Pacifico',cursive;font-size:clamp(18px,3.2vw,28px)}
+#photo{width:min(86vw,520px);border-radius:14px;margin:18px 0}
 
-  @keyframes heartbeat {
-    0%,100% { transform: scale(1); }
-    25% { transform: scale(1.05); }
-    75% { transform: scale(1.08); }
-  }
-
-  button {
-    padding: 15px 35px;
-    font-size: 1.2rem;
-    border: none;
-    border-radius: 30px;
-  }
-
-  #yesBtn {
-    background: #00e676;
-    color: black;
-    font-weight: bold;
-  }
-
-  #noBtn {
-    background: #ff1744;
-    color: white;
-    position: fixed;
-    top: 65%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .result {
-    display: none;
-    font-size: 2rem;
-    z-index: 10;
-    font-weight: bold;
-  }
-
-  .gif {
-    margin-top: 20px;
-    width: 260px;
-    border-radius: 20px;
-  }
-
-  .graffiti {
-    position: absolute;
-    font-size: 30px;
-    font-weight: bold;
-    opacity: 0.85;
-    z-index: 9;
-  }
+/* ---------- 🔹 GAME ADDITION (styles only) ---------- */
+#heartGame{
+  position:absolute; inset:0; z-index:15;
+  pointer-events:auto;
+}
+#heartHUD{
+  position:absolute; top:16px; left:50%;
+  transform:translateX(-50%);
+  font-family:'Pacifico',cursive;
+  color:#ffd6e8; font-size:22px;
+  display:flex; gap:18px;
+}
+.catch-heart{
+  position:absolute;
+  font-size:32px;
+  cursor:pointer;
+  animation:floatUp 4s ease forwards;
+}
+@keyframes floatUp{
+  0%{opacity:0;transform:translateY(40px)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateY(-140px)}
+}
+.combo-pop{
+  animation:comboPop .35s ease;
+}
+@keyframes comboPop{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.5)}
+  100%{transform:scale(1)}
+}
 </style>
 </head>
-
 <body>
 
-<canvas id="fireworks"></canvas>
+<audio id="music" src="make-you-mine.mp3" preload="auto" loop></audio>
 
-<!-- Romantic music (plays after YES) -->
-<audio id="song">
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
-</audio>
-
-<div class="container" id="main">
-  <h1>MEA, WILL YOU BE MY VALENTINE? 💘</h1>
-  <button id="yesBtn">YES 💖</button>
-  <button id="noBtn">NO 💔</button>
+<!-- INTRO -->
+<div id="intro" class="screen">
+  <h1 class="name">❤️ Mea ❤️</h1>
+  <h2 class="question">Will you be my Valentine? 💖</h2>
+  <div class="buttons">
+    <button class="yes" id="yesBtn">Yes! 💕</button>
+    <button class="no" id="noBtn">No 💔</button>
+  </div>
 </div>
 
-<div class="result" id="result">
-  I KNEW YOU LOVE ME 😎💃🕺
-  <br>
-  <img class="gif"
-       src="https://media.giphy.com/media/26FLdmIp6wJr91JAI/giphy.gif"
-       alt="Happy couple dancing">
+<!-- RESULT -->
+<div id="result" class="screen hidden">
+  <canvas id="fireworks" class="anim-canvas"></canvas>
+  <canvas id="confetti" class="anim-canvas"></canvas>
+  <div id="petals"></div>
+
+  <!-- 🔹 GAME ADDITION -->
+  <div id="heartGame">
+    <div id="heartHUD">
+      <div>💖 <span id="score">0</span></div>
+      <div>🔥 x<span id="combo">1</span></div>
+    </div>
+  </div>
+
+  <div class="result-layer">
+    <div class="result-title">💖 GREAT CHOICE 💖</div>
+    <div class="result-sub">I knew you loved me 😘</div>
+    <img id="photo" src="https://media.giphy.com/media/ch6BQvE0MWlB6/giphy.gif">
+    <div class="result-sub">I Love You ❤️</div>
+  </div>
 </div>
 
 <script>
-/* ---------------- NO button escape ---------------- */
-const noBtn = document.getElementById("noBtn");
+/* helpers */
+const rand=(a,b)=>a+Math.random()*(b-a);
 
-function escapeNo() {
-  noBtn.style.left = Math.random() * 80 + "vw";
-  noBtn.style.top = Math.random() * 80 + "vh";
-}
+/* intro hearts */
+setInterval(()=>{
+  const h=document.createElement('div');
+  h.className='floating-heart';
+  h.textContent='💖';
+  h.style.left=rand(5,95)+'vw';
+  h.style.top=rand(25,70)+'vh';
+  h.style.animation=`heartFloat ${rand(4.5,7)}s ease forwards`;
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),8000);
+},600);
 
-noBtn.addEventListener("mouseover", escapeNo);
-noBtn.addEventListener("touchstart", escapeNo);
+/* yes click */
+yesBtn.onclick=()=>{
+  music.volume=0; music.play();
+  let v=0; const iv=setInterval(()=>{v+=.05;music.volume=v;if(v>=.75)clearInterval(iv)},80);
+  intro.classList.add('hidden');
+  setTimeout(()=>{
+    result.classList.remove('hidden');
+    startCatchGame();   // 🔹 game starts here
+  },260);
+};
 
-/* ---------------- FIREWORKS ---------------- */
-const canvas = document.getElementById("fireworks");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+/* ---------- 🔹 GAME ADDITION (logic) ---------- */
+function startCatchGame(){
+  const wrap=document.getElementById('heartGame');
+  const scoreEl=document.getElementById('score');
+  const comboEl=document.getElementById('combo');
 
-let particles = [];
-let fireworksActive = false;
+  let score=0, combo=1, lastHit=0, TARGET=8;
 
-function randomColor() {
-  return `hsl(${Math.random() * 360},100%,60%)`;
-}
+  function spawn(){
+    if(score>=TARGET){ wrap.remove(); return; }
 
-function createFirework() {
-  const x = Math.random() * canvas.width;
-  const y = Math.random() * canvas.height / 2;
-  for (let i = 0; i < 80; i++) {
-    particles.push({
-      x, y,
-      vx: (Math.random() - 0.5) * 6,
-      vy: (Math.random() - 0.5) * 6,
-      life: 60,
-      color: randomColor()
-    });
+    const h=document.createElement('div');
+    h.className='catch-heart';
+    h.textContent='💖';
+    h.style.left=rand(10,80)+'vw';
+    h.style.top=rand(55,80)+'vh';
+
+    h.onclick=()=>{
+      const now=Date.now();
+      combo = (now-lastHit<1200)? combo+1 : 1;
+      lastHit=now;
+
+      score += combo;
+      scoreEl.textContent=score;
+      comboEl.textContent=combo;
+      comboEl.classList.add('combo-pop');
+      setTimeout(()=>comboEl.classList.remove('combo-pop'),300);
+
+      if(navigator.vibrate) navigator.vibrate(30);
+      h.remove();
+    };
+    wrap.appendChild(h);
+    setTimeout(()=>h.remove(),4500);
   }
+  const si=setInterval(spawn,850);
+  setTimeout(()=>{clearInterval(si);wrap.remove();},15000);
 }
-
-function animateFireworks() {
-  if (!fireworksActive) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  particles.forEach((p, i) => {
-    p.x += p.vx;
-    p.y += p.vy;
-    p.life--;
-    ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y, 3, 3);
-    if (p.life <= 0) particles.splice(i, 1);
-  });
-
-  if (Math.random() < 0.05) createFirework();
-  requestAnimationFrame(animateFireworks);
-}
-
-/* ---------------- YES CLICK ---------------- */
-document.getElementById("yesBtn").addEventListener("click", () => {
-  document.getElementById("main").style.display = "none";
-  document.getElementById("result").style.display = "block";
-
-  // Play music
-  document.getElementById("song").play();
-
-  // Phone vibration
-  if (navigator.vibrate) {
-    navigator.vibrate([200, 100, 200, 100, 300]);
-  }
-
-  // Start fireworks
-  fireworksActive = true;
-  animateFireworks();
-
-  // Love graffiti
-  for (let i = 0; i < 20; i++) {
-    const g = document.createElement("div");
-    g.className = "graffiti";
-    g.innerText = "LOVE 💕";
-    g.style.left = Math.random() * 100 + "vw";
-    g.style.top = Math.random() * 100 + "vh";
-    document.body.appendChild(g);
-  }
-});
 </script>
-
 </body>
 </html>
