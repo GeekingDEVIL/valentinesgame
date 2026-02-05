@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💖</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at bottom, #ff5f9e, #ff2d6f);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .container {
+    z-index: 10;
+    width: 100%;
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    animation: heartbeat 1.4s infinite;
+  }
+
+  @keyframes heartbeat {
+    0%,100% { transform: scale(1); }
+    25% { transform: scale(1.05); }
+    75% { transform: scale(1.08); }
+  }
+
+  button {
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 30px;
+  }
+
+  #yesBtn {
+    background: #00e676;
+    color: black;
+    font-weight: bold;
+  }
+
+  #noBtn {
+    background: #ff1744;
+    color: white;
+    position: fixed;
+    top: 65%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .result {
+    display: none;
+    font-size: 2rem;
+    z-index: 10;
+    font-weight: bold;
+  }
+
+  .gif {
+    margin-top: 20px;
+    width: 260px;
+    border-radius: 20px;
+  }
+
+  .graffiti {
+    position: absolute;
+    font-size: 30px;
+    font-weight: bold;
+    opacity: 0.85;
+    z-index: 9;
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<!-- Romantic music (plays after YES) -->
+<audio id="song">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container" id="main">
+  <h1>MEA, WILL YOU BE MY VALENTINE? 💘</h1>
+  <button id="yesBtn">YES 💖</button>
+  <button id="noBtn">NO 💔</button>
+</div>
+
+<div class="result" id="result">
+  I KNEW YOU LOVE ME 😎💃🕺
+  <br>
+  <img class="gif"
+       src="https://media.giphy.com/media/26FLdmIp6wJr91JAI/giphy.gif"
+       alt="Happy couple dancing">
+</div>
+
+<script>
+/* ---------------- NO button escape ---------------- */
+const noBtn = document.getElementById("noBtn");
+
+function escapeNo() {
+  noBtn.style.left = Math.random() * 80 + "vw";
+  noBtn.style.top = Math.random() * 80 + "vh";
+}
+
+noBtn.addEventListener("mouseover", escapeNo);
+noBtn.addEventListener("touchstart", escapeNo);
+
+/* ---------------- FIREWORKS ---------------- */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+let particles = [];
+let fireworksActive = false;
+
+function randomColor() {
+  return `hsl(${Math.random() * 360},100%,60%)`;
+}
+
+function createFirework() {
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height / 2;
+  for (let i = 0; i < 80; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      life: 60,
+      color: randomColor()
+    });
+  }
+}
+
+function animateFireworks() {
+  if (!fireworksActive) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life--;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 3, 3);
+    if (p.life <= 0) particles.splice(i, 1);
+  });
+
+  if (Math.random() < 0.05) createFirework();
+  requestAnimationFrame(animateFireworks);
+}
+
+/* ---------------- YES CLICK ---------------- */
+document.getElementById("yesBtn").addEventListener("click", () => {
+  document.getElementById("main").style.display = "none";
+  document.getElementById("result").style.display = "block";
+
+  // Play music
+  document.getElementById("song").play();
+
+  // Phone vibration
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 200, 100, 300]);
+  }
+
+  // Start fireworks
+  fireworksActive = true;
+  animateFireworks();
+
+  // Love graffiti
+  for (let i = 0; i < 20; i++) {
+    const g = document.createElement("div");
+    g.className = "graffiti";
+    g.innerText = "LOVE 💕";
+    g.style.left = Math.random() * 100 + "vw";
+    g.style.top = Math.random() * 100 + "vh";
+    document.body.appendChild(g);
+  }
+});
+</script>
+
+</body>
+</html>
